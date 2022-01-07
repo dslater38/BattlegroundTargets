@@ -37,7 +37,7 @@
 -- # Range Check: ----------------------------------------------------------- --
 --   - Events:             - COMBAT_LOG_EVENT_UNFILTERED (Enemy only)         --
 --                         - PLAYER_TARGET_CHANGED                            --
---                         - UNIT_HEALTH_FREQUENT                             --
+--                         - UNIT_HEALTH                             --
 --                         - UPDATE_MOUSEOVER_UNIT                            --
 --                         - UNIT_TARGET                                      --
 --   - The data to determine the distance to an enemy is not always available.--
@@ -48,7 +48,7 @@
 --                                                                            --
 -- # Health: ---------------------------------------------------------------- --
 --   - Events:             - UNIT_TARGET                                      --
---                         - UNIT_HEALTH_FREQUENT                             --
+--                         - UNIT_HEALTH                             --
 --                         - UPDATE_MOUSEOVER_UNIT                            --
 --   - The health from an enemy is not always available.                      --
 --     This is restricted by the WoW API.                                     --
@@ -132,7 +132,7 @@ local GetBattlefieldArenaFaction = GetBattlefieldArenaFaction
 local GetBattlefieldScore = GetBattlefieldScore
 local GetBattlefieldStatus = GetBattlefieldStatus
 local GetBattlegroundInfo = GetBattlegroundInfo
-local GetClassInfoByID = GetClassInfoByID
+local GetClassInfo = GetClassInfo
 local GetCurrentMapAreaID = GetCurrentMapAreaID
 local GetLocale = GetLocale
 local GetMaxPlayerLevel = GetMaxPlayerLevel
@@ -543,15 +543,15 @@ local classes = {
 -- roles: 1 = HEALER | 2 = TANK | 3 = DAMAGER
 local classROLES = {HEALER = {}, TANK = {}, DAMAGER = {}}
 for classID = 1, MAX_CLASSES do
-	local _, classTag = GetClassInfoByID(classID)
+	local _, classTag = GetClassInfo(classID)
 	local numTabs = GetNumSpecializationsForClassID(classID)
 	--print(numTabs, classID, "#", GetNumSpecializationsForClassID(classID))
 	classes[classTag].spec = {}
 	classes[classTag].fixname = {}
 	classes[classTag].fix = false
 	for i = 1, numTabs do
-		local id, name, _, icon, _, role = GetSpecializationInfoForClassID(classID, i)
-		--print(role, id, classID, i, name, icon, "#", GetSpecializationInfoForClassID(classID, i))
+		local id, name, _, icon, role, _, _ = GetSpecializationInfoForClassID(classID, i)
+		-- print("role:", role, "id:", id, "classID:", classID, "i:", i, "name:", name, "icon:", icon, "#", GetSpecializationInfoForClassID(classID, i))
 		if     role == "DAMAGER" then classes[classTag].spec[i] = {role = 3, specID = id, specName = name, icon = icon} tinsert(classROLES.DAMAGER, {classTag = classTag, specIndex = i}) -- DAMAGER: total = 23
 		elseif role == "HEALER"  then classes[classTag].spec[i] = {role = 1, specID = id, specName = name, icon = icon} tinsert(classROLES.HEALER,  {classTag = classTag, specIndex = i}) -- HEALER : total =  6
 		elseif role == "TANK"    then classes[classTag].spec[i] = {role = 2, specID = id, specName = name, icon = icon} tinsert(classROLES.TANK,    {classTag = classTag, specIndex = i}) -- TANK   : total =  5
@@ -5367,7 +5367,7 @@ end
 
 -- ---------------------------------------------------------------------------------------------------------------------
 function BattlegroundTargets:OptionsFrameHide()
-	PlaySound("igQuestListClose")
+	PlaySound(SOUNDKIT.IG_QUEST_LIST_CLOSE)
 	isConfig = false
 	BattlegroundTargets:EventRegister()
 	TEMPLATE.EnableTextButton(GVAR.InterfaceOptions.CONFIG)
@@ -5390,7 +5390,7 @@ end
 function BattlegroundTargets:OptionsFrameShow()
 	local BattlegroundTargets_Options = BattlegroundTargets_Options
 
-	PlaySound("igQuestListOpen")
+	PlaySound(SOUNDKIT.IG_QUEST_LIST_OPEN)
 	isConfig = true
 	BattlegroundTargets:EventUnregister()
 	TEMPLATE.DisableTextButton(GVAR.InterfaceOptions.CONFIG)
@@ -9631,7 +9631,7 @@ function BattlegroundTargets:EventRegister(showerror)
 	   BattlegroundTargets_Options.Enemy.ButtonHealthBarToggle[currentSize] or BattlegroundTargets_Options.Enemy.ButtonHealthTextToggle[currentSize]
 	then
 		BattlegroundTargets:RegisterEvent("UNIT_TARGET")
-		BattlegroundTargets:RegisterEvent("UNIT_HEALTH_FREQUENT")
+		BattlegroundTargets:RegisterEvent("UNIT_HEALTH")
 		BattlegroundTargets:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 	end
 
@@ -9723,7 +9723,7 @@ function BattlegroundTargets:EventRegister(showerror)
 				DATA[side].rangeMin = Min
 				DATA[side].rangeMax = Max
 				if isKnown and SpellName and Min and Min >= 0 and Max and Max > 0 then
-					BattlegroundTargets:RegisterEvent("UNIT_HEALTH_FREQUENT")
+					BattlegroundTargets:RegisterEvent("UNIT_HEALTH")
 					BattlegroundTargets:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 					BattlegroundTargets:RegisterEvent("PLAYER_TARGET_CHANGED")
 					BattlegroundTargets:RegisterEvent("UNIT_TARGET")
@@ -9760,7 +9760,7 @@ function BattlegroundTargets:EventUnregister()
 	BattlegroundTargets:UnregisterEvent("PLAYER_DEAD")
 	BattlegroundTargets:UnregisterEvent("PLAYER_UNGHOST")
 	BattlegroundTargets:UnregisterEvent("PLAYER_ALIVE")
-	BattlegroundTargets:UnregisterEvent("UNIT_HEALTH_FREQUENT")
+	BattlegroundTargets:UnregisterEvent("UNIT_HEALTH")
 	BattlegroundTargets:UnregisterEvent("UPDATE_MOUSEOVER_UNIT")
 	BattlegroundTargets:UnregisterEvent("UNIT_TARGET")
 	BattlegroundTargets:UnregisterEvent("PLAYER_TARGET_CHANGED")
@@ -9839,7 +9839,7 @@ local function OnEvent(self, event, ...)
 		--]]
 		CombatLogRangeCheck(sourceName, destName, spellId)
 
-	elseif event == "UNIT_HEALTH_FREQUENT" then
+	elseif event == "UNIT_HEALTH" then
 		local arg1 = ...
 		BattlegroundTargets:CheckUnitHealth(arg1)
 	elseif event == "UNIT_TARGET" then
