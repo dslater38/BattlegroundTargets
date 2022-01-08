@@ -149,12 +149,13 @@ local GetTime = GetTime
 local InCombatLockdown = InCombatLockdown
 local IsActiveBattlefieldArena = IsActiveBattlefieldArena
 local IsInInstance = IsInInstance
-local IsRatedBattleground = IsRatedBattleground
+local IsRatedBattleground = C_PvP.IsRatedBattleground
 local IsSpellInRange = IsSpellInRange
 local IsSpellKnown = IsSpellKnown
 local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 local SetBattlefieldScoreFaction = SetBattlefieldScoreFaction
-local SetMapToCurrentZone = SetMapToCurrentZone
+-- local SetMapToCurrentZone = SetMapToCurrentZone
+local GetBestMapForUnit = C_Map.GetBestMapForUnit
 local UnitBuff = UnitBuff
 local UnitClass = UnitClass
 local UnitDebuff = UnitDebuff
@@ -323,8 +324,17 @@ local pvptrinketIDs = {
   [42292] = 120, --trinket
   [59752] =  30,  -- human
   
+  [122370] = 120,  -- Inherited Insignia of the Horde
+  [122371] = 120,  -- Inherited Insignia of the Alliance
   [195710] = 180,  -- 180 PvP talent Trinket
-  [208683] = 120  -- 120 PvP talent Trinket
+  [208683] = 120,  -- 120 PvP talent Trinket
+  [185304] = 120, -- Unchained Gladiator's Medallion
+  [185309] = 120, -- Unchained Aspirant's Medallion
+  [181333] = 120, -- Sinful Gladiator's Medallion
+  [184052] = 120, -- Sinful Aspirant's Medallion
+  [184055] = 120, -- Corrupted Gladiator's Medallion
+  [184058] = 120, -- Corrupted Aspirant's Medallion
+  [336126] = 120, -- Gladiator's Medallion
 }
 
 DATA.TransName = {}           -- key = unitName | value (string) = transliteration name
@@ -408,6 +418,9 @@ local function BuildBattlegroundMapTable()
 		elseif bgID == 708 then mapID[860] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 0} -- Silvershard Mines
 		elseif bgID == 754 then mapID[935] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 4} -- Deepwind Gorge
 		elseif bgID == 789 then                            bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Southshore vs Tarren Mill
+		elseif bgID == 894 then mapID[907] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 0} -- Seething Shore
+		elseif bgID == 1014 then mapID[443] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 1} -- Battle for  Wintergrasp
+		elseif bgID == 1020 then mapID[1478] = localizedName bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Ashran		
 		end
 	end
 end
@@ -7029,8 +7042,8 @@ function BattlegroundTargets:IsBattleground()
 	if not currentBGMap then
 		local wmf = WorldMapFrame
 		if wmf and not wmf:IsShown() then
-			SetMapToCurrentZone()
-			local mapId = GetCurrentMapAreaID()
+			local mapId = GetBestMapForUnit("player")
+			print("mapID: ", mapId);
 			mapName = mapID[mapId]
 			if bgMaps[mapName] then
 				currentBGMap = mapName
@@ -9824,7 +9837,7 @@ local function OnEvent(self, event, ...)
 		end
 
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local _, clEvent, _, _, sourceName, sourceFlags, _, _, destName, destFlags, _, spellId = ...
+		local _, clEvent, _, _, sourceName, sourceFlags, _, _, destName, destFlags, _, spellId, spellName = CombatLogGetCurrentEventInfo();
 		if not sourceFlags or band(sourceFlags, 0x00000400) == 0 then return end
 		CombatLogPVPTrinketCheck(clEvent, spellId, sourceName)
 		if not destFlags or band(destFlags, 0x00000400) == 0 then return end
