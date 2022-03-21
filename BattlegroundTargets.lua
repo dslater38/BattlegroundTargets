@@ -154,7 +154,6 @@ local IsSpellInRange = IsSpellInRange
 local IsSpellKnown = IsSpellKnown
 local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 local SetBattlefieldScoreFaction = SetBattlefieldScoreFaction
--- local SetMapToCurrentZone = SetMapToCurrentZone
 local GetBestMapForUnit = C_Map.GetBestMapForUnit
 local UnitBuff = UnitBuff
 local UnitClass = UnitClass
@@ -416,11 +415,26 @@ local function BuildBattlegroundMapTable()
 		elseif bgID == 120 then mapID[736] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 0} -- The Battle for Gilneas
 		elseif bgID == 699 then mapID[856] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 5} -- Temple of Kotmogu
 		elseif bgID == 708 then mapID[860] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 0} -- Silvershard Mines
-		elseif bgID == 754 then mapID[935] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 4} -- Deepwind Gorge
-		elseif bgID == 789 then                            bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Southshore vs Tarren Mill
+		elseif bgID == 754 then mapID[935] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 0} -- Deepwind Gorge
+		elseif bgID == 1105 then mapID[1576] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 0} -- Deepwind Gorge
+		elseif bgID == 789 then mapID[1010] = localizedName bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Southshore vs Tarren Mill
+		elseif bgID == 789 then mapID[623] = localizedName bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Brawl: Southshore vs. Tarren Mill
 		elseif bgID == 894 then mapID[907] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 0} -- Seething Shore
-		elseif bgID == 1014 then mapID[443] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 1} -- Battle for  Wintergrasp
-		elseif bgID == 1020 then mapID[1478] = localizedName bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Ashran		
+		elseif bgID == 1017 then mapID[1334] = localizedName bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Battle for Wintergrasp
+		elseif bgID == 	 3 then mapID[1366] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 0} -- Arathi Basin
+		elseif bgID ==   2 then mapID[1339] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 1} -- Warsong Gulch
+		elseif bgID == 789 then mapID[1010] = localizedName bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Ashran
+		elseif bgID == 489 then mapID[626] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 3} -- Twin Peaks
+		elseif bgID == 1014 then mapID[2106] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 1} -- Warsong Gulch
+		elseif bgID == 1018 then mapID[2107] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 0} -- Arathi Basin
+		elseif bgID == 1020 then                            bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Trashran
+		elseif bgID == 519 then mapID[935] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 4} -- Deepwind Gorge
+		elseif bgID == 754 then mapID[1105] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 0} -- Deepwind Gorge
+		elseif bgID == 881 then mapID[1105] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 0} -- Deepwind Gorge
+		elseif bgID == 1037 then mapID[2245] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 0} -- Deepwind Gorge
+		elseif bgID == 1039 then mapID[2245] = localizedName bgMaps[localizedName] = {bgSize = 15, flagBG = 0} -- Deepwind Gorge
+		elseif bgID == 1017 then mapID[2118] = localizedName bgMaps[localizedName] = {bgSize = 40, flagBG = 0} -- Wintergrasp
+		elseif bgID == 894 then mapID[907] = localizedName bgMaps[localizedName] = {bgSize = 10, flagBG = 0} -- Бурлящий берег
 		end
 	end
 end
@@ -563,7 +577,7 @@ for classID = 1, MAX_CLASSES do
 	classes[classTag].fixname = {}
 	classes[classTag].fix = false
 	for i = 1, numTabs do
-		local id, name, _, icon, role, _, _ = GetSpecializationInfoForClassID(classID, i)
+		local id, name, _, icon, role = GetSpecializationInfoForClassID(classID, i)
 		-- print("role:", role, "id:", id, "classID:", classID, "i:", i, "name:", name, "icon:", icon, "#", GetSpecializationInfoForClassID(classID, i))
 		if     role == "DAMAGER" then classes[classTag].spec[i] = {role = 3, specID = id, specName = name, icon = icon} tinsert(classROLES.DAMAGER, {classTag = classTag, specIndex = i}) -- DAMAGER: total = 23
 		elseif role == "HEALER"  then classes[classTag].spec[i] = {role = 1, specID = id, specName = name, icon = icon} tinsert(classROLES.HEALER,  {classTag = classTag, specIndex = i}) -- HEALER : total =  6
@@ -5380,7 +5394,7 @@ end
 
 -- ---------------------------------------------------------------------------------------------------------------------
 function BattlegroundTargets:OptionsFrameHide()
-	PlaySound(SOUNDKIT.IG_QUEST_LIST_CLOSE)
+	PlaySound(SOUNDKIT.IG_QUEST_LIST_CLOSE);
 	isConfig = false
 	BattlegroundTargets:EventRegister()
 	TEMPLATE.EnableTextButton(GVAR.InterfaceOptions.CONFIG)
@@ -7043,7 +7057,7 @@ function BattlegroundTargets:IsBattleground()
 		local wmf = WorldMapFrame
 		if wmf and not wmf:IsShown() then
 			local mapId = GetBestMapForUnit("player")
-			print("mapID: ", mapId);
+			-- print("mapID: ", mapId);
 			mapName = mapID[mapId]
 			if bgMaps[mapName] then
 				currentBGMap = mapName
@@ -8236,7 +8250,7 @@ function BattlegroundTargets:CheckFlagCarrierCHECK(unitID, unitName) -- FLAGSPY
 
 		-- enemy buff & debuff check
 		for i = 1, 40 do
-			local _, _, _, _, _, _, _, _, _, _, spellId = UnitBuff(unitID, i)
+			local _, _, _, _, _, _, _, _, _, spellId = UnitBuff(unitID, i)
 			if not spellId then break end
 			if flagIDs[spellId] then
 				DATA.Enemy.hasFlag = unitName
@@ -8244,7 +8258,7 @@ function BattlegroundTargets:CheckFlagCarrierCHECK(unitID, unitName) -- FLAGSPY
 				flags = flags + 1
 
 				for j = 1, 40 do
-					local _, _, _, count, _, _, _, _, _, _, spellId = UnitDebuff(unitID, j)
+					local _, _, count, _, _, _, _, _, _, spellId = UnitDebuff(unitID, j)
 					if not spellId then break end
 					if debuffIDs[spellId] then
 						flagDebuff = count
@@ -8276,7 +8290,7 @@ function BattlegroundTargets:CheckFlagCarrierCHECK(unitID, unitName) -- FLAGSPY
 			return
 		end
 		for i = 1, 40 do
-			local _, _, _, _, _, _, _, _, _, _, spellId, _, _, _, _, val2 = UnitDebuff(unitID, i)
+			local _, _, _, _, _, _, _, _, _, spellId, _, _, _, _, val2 = UnitDebuff(unitID, i)
 			--print(i, spellId, val2, "#", UnitDebuff(unitID, i))
 			if not spellId then break end
 			if orbIDs[spellId] then
@@ -8328,14 +8342,14 @@ function BattlegroundTargets:CheckFlagCarrierSTART() -- FLAGSPY
 			for num = 1, GetNumGroupMembers() do
 				local unitID = "raid"..num
 				for i = 1, 40 do
-					local _, _, _, _, _, _, _, _, _, _, spellId = UnitBuff(unitID, i)
+					local _, _, _, _, _, _, _, _, _, spellId = UnitBuff(unitID, i)
 					if not spellId then break end
 					if flagIDs[spellId] then
 						flagDebuff = 0
 						flags = 1
 
 						for j = 1, 40 do
-							local _, _, _, count, _, _, _, _, _, _, spellId = UnitDebuff(unitID, j)
+							local _, _, count, _, _, _, _, _, _, spellId = UnitDebuff(unitID, j)
 							if not spellId then break end
 							if debuffIDs[spellId] then
 								flagDebuff = count
@@ -8372,7 +8386,7 @@ function BattlegroundTargets:CheckFlagCarrierSTART() -- FLAGSPY
 		-- friend debuff check
 		for num = 1, GetNumGroupMembers() do
 			for i = 1, 40 do
-				local _, _, _, _, _, _, _, _, _, _, spellId, _, _, _, _, val2 = UnitDebuff("raid"..num, i)
+				local _, _, _, _, _, _, _, _, _, spellId, _, _, _, _, val2 = UnitDebuff("raid"..num, i)
 				if not spellId then break end
 				if orbIDs[spellId] then
 					flags = flags + 1 -- FLAG_TOK_CHK
@@ -8530,7 +8544,7 @@ function BattlegroundTargets:CarrierDebuffCheck(side, button, uID, uName) -- car
 	if isFlagBG > 0 and isFlagBG < 5 then
 		-- flag
 		for i = 1, 40 do
-			local _, _, _, count, _, _, _, _, _, _, spellId = UnitDebuff(uID, i)
+			local _, _, count, _, _, _, _, _, _, spellId = UnitDebuff(uID, i)
 			--print(uID, uName, i, "#", spellId, count, "#", UnitDebuff(uID, i))
 			if debuffIDs[spellId] then
 				flagDebuff = count
@@ -8542,7 +8556,7 @@ function BattlegroundTargets:CarrierDebuffCheck(side, button, uID, uName) -- car
 	elseif isFlagBG == 5 then
 		-- orb
 		for i = 1, 40 do
-			local _, _, _, _, _, _, _, _, _, _, spellId, _, _, _, _, val2 = UnitDebuff(uID, i)
+			local _, _, _, _, _, _, _, _, _, spellId, _, _, _, _, val2 = UnitDebuff(uID, i)
 			--print(uID, uName, i, "#", spellId, val2, "#", UnitDebuff(uID, i))
 			if orbIDs[spellId] then
 				local hasflg
@@ -9837,7 +9851,7 @@ local function OnEvent(self, event, ...)
 		end
 
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local _, clEvent, _, _, sourceName, sourceFlags, _, _, destName, destFlags, _, spellId, spellName = CombatLogGetCurrentEventInfo();
+		local _, clEvent, _, _, sourceName, sourceFlags, _, _, destName, destFlags, _, spellId = CombatLogGetCurrentEventInfo();
 		if not sourceFlags or band(sourceFlags, 0x00000400) == 0 then return end
 		CombatLogPVPTrinketCheck(clEvent, spellId, sourceName)
 		if not destFlags or band(destFlags, 0x00000400) == 0 then return end
